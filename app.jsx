@@ -8,25 +8,22 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import GroupDetail from './pages/GroupDetail';
 import api from './api/api'; // Axios instance with JWT
+import { loginUser } from './redux/userSlice';
 
-// Auto-login component to restore user session if token exists
+// Optional: Auto-login if token exists
 const AutoLogin = ({ children }) => {
   const dispatch = useDispatch();
-
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      // Validate token with backend and fetch user info
+      // You can call an endpoint to validate token or fetch user
       api.get('/auth/me')
         .then((res) => {
-          dispatch({
-            type: 'user/loginUser/fulfilled',
-            payload: { user: res.data, token },
-          });
+          dispatch({ type: 'user/loginUser/fulfilled', payload: { user: res.data, token } });
         })
         .catch((err) => {
-          console.log('Invalid token, please login again');
           localStorage.removeItem('token');
+          console.log('Token invalid, please login again');
         });
     }
   }, [dispatch]);
